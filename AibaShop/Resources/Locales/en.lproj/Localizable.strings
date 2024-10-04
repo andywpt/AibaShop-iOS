@@ -1,0 +1,3 @@
+// Note that for app name and Info.plist related text localization, it will use the device preferred language, instead of the app's preferred langauge.
+"greeting" = "Good Morning";
+
