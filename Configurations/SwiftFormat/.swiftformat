@@ -1,0 +1,15 @@
+# https://www.juxhinbakalli.com/posts/swiftFormat/
+--swiftversion 5.10
+# Exclude code that is generated or from third party dependencies.
+--exclude **/Pods
+
+# format options
+--importgrouping testable-first
+
+# rules
+--disable preferKeyPath
+
+# --enable blankLinesBetweenImports
+# --enable blankLineAfterSwitchCase
+# --enable wrapEnumCases
+# --enable wrapMultilineConditionalAssignment

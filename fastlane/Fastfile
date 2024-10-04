@@ -1,0 +1,157 @@
+opt_out_usage
+platform :ios do
+ desc "Load App Store Connect API token"
+ lane :create_api_token do
+   app_store_connect_api_key(
+     key_id: ENV["APPSTORE_API_KEY_ID"],
+     issuer_id: ENV["APPSTORE_API_ISSUER_ID"],
+     key_filepath: ENV["APPSTORE_API_KEY_PATH"]
+   )
+ end
+
+ desc "Install distribution certificate in the keychain"
+ lane :install_distribution_certificate do
+   keychain_name = "signing"
+   keychain_password = ""
+
+   delete_keychain(
+     name: keychain_name
+   ) if File.exist? File.expand_path("~/Library/Keychains/#{keychain_name}-db")
+
+   create_keychain(
+     name: keychain_name,
+     password: keychain_password,
+     default_keychain: true,
+     unlock: true,
+     timeout: 0,
+     require_create: true
+   )
+
+   import_certificate(
+     certificate_path: ENV["APPLE_CERTIFICATE_PATH"],
+     keychain_name: keychain_name,
+     keychain_password: keychain_password,
+     log_output: true
+   )
+ end
+ 
+ desc "Configure code signing settings in Xcode before build"
+ lane :configure_signing_settings do |options|
+
+    sigh(app_identifier: ENV['IOS_PRODUCTION_BUNDLE_ID'])
+
+    update_code_signing_settings(
+      targets: [ENV['IOS_TARGET_NAME']],
+      code_sign_identity: "iPhone Distribution",
+      team_id: ENV['DEVELOPMENT_TEAM'],
+      profile_uuid: lane_context[SharedValues::SIGH_UUID] 
+    )
+  
+    sigh(app_identifier: "com.aibashop.ios.notification")
+
+    update_code_signing_settings(
+      targets: ["NotificationExtension"],
+      code_sign_identity: "iPhone Distribution",
+      team_id: ENV['TEAM_ID'],
+      profile_uuid: lane_context[SharedValues::SIGH_UUID] 
+    )
+ end
+
+ desc "Increment app build number"
+ lane :update_app_build_number do
+   current_version = get_version_number(target: ENV['IOS_TARGET_NAME'])
+   latest_build_number = latest_testflight_build_number(version: current_version)
+   increment_build_number(build_number: (latest_build_number + 1))
+ end
+
+ desc "Archive app"
+ private_lane :archive_app do 
+    ios_target_name = ENV['IOS_TARGET_NAME']
+    scheme = "Production"
+    configuration = "Production-Release"
+    
+    derived_data_path = File.expand_path("../.local_derived_data")
+    cache_folder = File.expand_path("#{derived_data_path}/Build/Intermediates.noindex/ArchiveIntermediates/#{scheme}/BuildProductsPath/#{configuration}-iphoneos")
+    # Step 0) Check if cache exists 
+    if(File.exist?(cache_folder))
+      # Step 1) Apply a fix of "[CP] Embed Pods Frameworks" Build Phase 
+      #
+      # Before:
+      # "${PODS_ROOT}/Target Support Files/Pods-{Target}/Pods-{TARGET}-frameworks.sh"
+      #
+      # After:
+      # BUILT_PRODUCTS_DIR=/a/b/c "${PODS_ROOT}/Target Support Files/Pods-MyApp/Pods-MyApp-resources.sh"
+#      [CP] Copy Pods Resources is run script that CocoaPods automatically adds to your project. It takes care of copying pod resources to the proper directory so that they'll be part of the final archive.
+
+      fastlane_require 'xcodeproj'
+      project = Xcodeproj::Project.open("../#{ENV["PROJECT_NAME"]}.xcodeproj")
+      target = project.targets.select { |target| target.name == ios_target_name }.first
+      phase = target.shell_script_build_phases.select { |phase| phase.name && phase.name.include?('[CP] Embed Pods Frameworks') }.first
+      if (!phase.shell_script.start_with?('BUILT_PRODUCTS_DIR'))
+        phase.shell_script = "BUILT_PRODUCTS_DIR=#{cache_folder} #{phase.shell_script}"
+        project.save()
+      end
+      # Step 2) Build only .xcodeproj 
+      gym(
+        project: "#{ENV["PROJECT_NAME"]}.xcodeproj",
+        scheme: scheme,
+        export_method: "app-store",
+        export_options: {
+          compileBitcode: false,
+          uploadBitcode: false,
+          uploadSymbols: false,
+          testFlightInternalTestingOnly: true
+        },
+        xcargs: [
+          # Step 3) Provide paths where xcode can't find pods binaries
+          "PODS_CONFIGURATION_BUILD_DIR=#{cache_folder}",
+          "FRAMEWORK_SEARCH_PATHS='#{cache_folder}\ $(inherited)'",
+          "LIBRARY_SEARCH_PATHS='#{cache_folder}\ $(inherited)'",
+          "SWIFT_INCLUDE_PATHS=#{cache_folder}"
+        ].join(" ")
+      )
+    else
+      gym(
+        workspace: "#{ENV["PROJECT_NAME"]}.xcworkspace",
+        scheme: scheme,
+        export_method: "app-store",
+        export_options: {
+            testFlightInternalTestingOnly: true
+        },
+        derived_data_path: derived_data_path,
+      )
+      # Step 5) Remove non-Pods binaries to reduce cache size
+      
+      require 'fileutils'
+      dirs = [
+        File.expand_path("#{derived_data_path}/info.plist"),
+        File.expand_path("#{derived_data_path}/Logs"),
+        File.expand_path("#{derived_data_path}/SourcePackages"),
+        File.expand_path("#{derived_data_path}/ModuleCache.noindex"),
+        File.expand_path("#{derived_data_path}/Build/Intermediates.noindex/ArchiveIntermediates/#{scheme}/IntermediateBuildFilesPath/XCBuildData"),
+        File.expand_path("#{derived_data_path}/Build/Intermediates.noindex/ArchiveIntermediates/#{scheme}/BuildProductsPath/SwiftSupport"),
+        File.expand_path("#{derived_data_path}/Build/Intermediates.noindex/ArchiveIntermediates/#{scheme}/PrecompiledHeaders"),
+        File.expand_path("#{derived_data_path}/Build/Intermediates.noindex/ArchiveIntermediates/#{scheme}/IntermediateBuildFilesPath/#{ENV["PROJECT_NAME"]}.build"),
+      ]
+      dirs.each { |dir| FileUtils.rm_rf(dir) }
+    end
+ end
+
+ lane :archive do
+    create_api_token
+    install_distribution_certificate
+    configure_signing_settings
+    update_app_build_number
+    archive_app
+ end
+
+ lane :submit_to_testflight do
+    create_api_token
+    testflight
+ end
+ 
+ lane :submit_to_appstore do
+    p CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+ end
+
+end

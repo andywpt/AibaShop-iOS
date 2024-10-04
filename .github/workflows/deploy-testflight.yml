@@ -1,0 +1,99 @@
+name: Upload To TestFlight
+
+on:
+  workflow_dispatch:
+  push:
+    tags: 
+      - 'v[0-9]+.[0-9]+.[0-9]+-beta.[0-9]+'
+
+jobs:
+  upload_to_testflight:
+    name: Upload To TestFlight
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Load passphrase from secrets
+        env:
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+        run: |
+          echo "${PASSPHRASE}" > passphrase
+
+      - name: Generate project
+        run: |
+          make
+
+      - name: Load cached Pod derived data
+        uses: actions/cache@v4
+        with:
+          path: .local_derived_data
+          key: pods-derived-data-${{ hashFiles('**/Podfile.lock') }}
+      
+      - name: Archive project
+        run: |
+          set -a && \
+          source fastlane/.fastlane.env && \
+          source Configurations/Decrypted/.fastlane.private.env && \
+          set +a && \
+          fastlane ios archive
+
+      - name: Cache Pod derived data
+        uses: actions/cache/save@v4
+        with:
+          path: .local_derived_data
+          key: pods-derived-data-${{ hashFiles('**/Podfile.lock') }}
+
+      - name: Upload to Testflight
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }} 
+        run: |
+          gem uninstall fastlane --silent
+          set -a && \
+          source fastlane/.fastlane.env && \
+          source Configurations/Decrypted/.fastlane.private.env && \
+          set +a && \
+          fastlane ios submit_to_testflight
+      # https://github.com/actions/cache/blob/main/caching-strategies.md#saving-cache-even-if-the-build-fails
+   #  sudo xcode-select -s /Applications/Xcode_${XCODE_VERSION}.app
+  notify_result:
+    needs: [upload_to_testflight]
+    if: always()
+    name: Notify Result
+    runs-on: macos-latest
+    env:
+      APP_ID: ${{ vars.APP_ID }}
+      ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+      RESULT: ${{ needs.upload_to_testflight.result }}
+      GITHUB_REPO: ${{ github.repository }}
+      RUN_ID: ${{ github.run_id }} 
+    steps:
+      - name: Get Job Log URL
+        id: jobs
+        uses: Tiryoh/gha-jobid-action@v1
+        with:
+          job_name: "Upload To TestFlight"
+
+      - name: Send notification message
+        if: always()
+        run: |
+          if [ "${RESULT}" == "success" ]; then
+            app_link="https://beta.itunes.apple.com/v1/app/${APP_ID}"
+            msg="📱 已更新Beta版本\n$\n${app_link}"
+          else
+            debug_link="${{ steps.jobs.outputs.html_url }}"
+            msg="⚠️ 無法更新Beta版本\n\n${debug_link}"
+          fi
+    
+          url="https://api.line.me/v2/bot/message/broadcast"
+          res="$(curl -i -o - --silent -X POST $url \
+          -H "Authorization: Bearer $ACCESS_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d "{\"messages\":[{\"type\":\"text\", \"text\":\"$msg\"}]}" )"
+    
+          status=$(echo "$res" | grep HTTP | awk '{print $2}')
+          if [ "$status" -ne 200 ]; then
+            echo "Request failed, full response:"
+            echo "$res"
+            exit 1
+          fi

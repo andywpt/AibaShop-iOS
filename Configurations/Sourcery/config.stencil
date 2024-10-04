@@ -1,0 +1,17 @@
+//swiftlint:disable all
+
+enum Config {
+
+   static let type = "{{ argument.TYPE }}"
+   static let baseUrl = "{{ argument.API_BASE_URL }}"
+   
+   enum Line {
+       static let channelId = "{{ argument.LINE_LOGIN_CHANNEL_ID }}"
+   }
+   
+   enum TapPay {
+       static let appId = "{{ argument.TAPPAY_APP_ID }}"
+       static let appKey = "{{ argument.TAPPAY_APP_KEY }}"
+   }
+
+}

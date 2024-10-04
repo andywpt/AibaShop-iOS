@@ -1,0 +1,190 @@
+name: ${PROJECT_NAME}
+
+options:
+  generateEmptyDirectories: true
+  groupOrdering: 
+    - order: 
+      - AibaShop
+      - Configurations
+      - NotificationExtension
+      
+  useBaseInternationalization: false
+  xcodeVersion: ${XCODE_VERSION}
+  deploymentTarget:
+    iOS: ${MINIMUM_IOS_VERSION}
+  preGenCommand: |
+    touch AibaShop/Resources/Configs/Config.swift
+  postGenCommand: |
+    cd Configurations/CocoaPods && pod install
+
+fileGroups:
+  - ${ROOT_DIR}/Configurations
+  - ${ROOT_DIR}/NotificationExtension
+ 
+configs:
+  Staging-Debug: debug
+  Staging-Release: release
+  Production-Debug: debug
+  Production-Release: release
+
+settings:
+  base: 
+    DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM}
+    SWIFT_STRICT_CONCURRENCY: complete
+    SWIFT_VERSION: 5
+  configs:
+    Staging:
+      LAUNCH_STORYBOARD_NAME: Staging
+    Production:
+      LAUNCH_STORYBOARD_NAME: Production
+ 
+schemes:
+  Staging:
+    build:
+      targets:
+        ${IOS_TARGET_NAME}: all
+    run:
+      config: Staging-Debug
+      debugEnabled: false
+      commandLineArguments:
+        -FIRDebugEnabled: true
+      environmentVariables:
+        - variable: IDEPreferLogStreaming
+          value: YES
+          isEnabled: true
+        - variable: OS_ACTIVITY_MODE
+          value: disable
+          isEnabled: false
+      
+    test:
+      config: Staging-Debug
+      debugEnabled: false
+      targets:
+        - name: ${IOS_TARGET_NAME}-UnitTests
+          parallelizable: false
+          randomExecutionOrder: false
+    profile:
+      config: Staging-Release
+    analyze:
+      config: Staging-Debug
+    archive:
+      config: Staging-Release
+      revealArchiveInOrganizer: false
+
+  Production:
+    build:
+      targets:
+        ${IOS_TARGET_NAME}: all
+    run:
+      config: Production-Debug
+      debugEnabled: false
+      commandLineArguments:
+        -FIRDebugEnabled: true
+      environmentVariables:
+        - variable: IDEPreferLogStreaming
+          value: YES
+          isEnabled: true
+        - variable: OS_ACTIVITY_MODE
+          value: disable
+          isEnabled: false
+    test:
+      config: Production-Debug
+      debugEnabled: false
+      targets:
+        - name: ${IOS_TARGET_NAME}-UnitTests
+          parallelizable: false
+          randomExecutionOrder: false
+    profile:
+      config: Production-Release
+    analyze:
+      config: Production-Debug
+    archive:
+      config: Production-Release
+      revealArchiveInOrganizer: false
+
+targets:
+  ${IOS_TARGET_NAME}:
+    type: application
+    platform: iOS
+    settings:
+      base:
+        TARGETED_DEVICE_FAMILY: 1
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: false
+        SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: false
+        SUPPORTS_MACCATALYST: false
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.shopping
+        MARKETING_VERSION: 1.0
+        CURRENT_PROJECT_VERSION: 1
+        OTHER_LDFLAGS:
+          - $(inherited)
+          - $(OTHER_LDFLAGS)
+          - -ObjC
+       
+      configs:
+        Staging:
+          PRODUCT_BUNDLE_IDENTIFIER: ${IOS_STAGING_BUNDLE_ID}
+          ASSETCATALOG_COMPILER_APPICON_NAME: ${IOS_STAGING_BUNDLE_APPICON_NAME}
+          CODE_SIGN_ENTITLEMENTS: AibaShop/Resources/Entitlements/Staging-AibaShop.entitlements
+
+        Production:
+          PRODUCT_BUNDLE_IDENTIFIER: ${IOS_PRODUCTION_BUNDLE_ID}
+          ASSETCATALOG_COMPILER_APPICON_NAME: ${IOS_PRODUCTION_BUNDLE_APPICON_NAME}
+          CODE_SIGN_ENTITLEMENTS: AibaShop/Resources/Entitlements/Production-AibaShop.entitlements
+    preBuildScripts:
+      - script: |
+          ${PROJECT_DIR}/Configurations/XcodeGen/pre_compile.sh
+        basedOnDependencyAnalysis: false
+    sources:
+      - path: "${ROOT_DIR}/${PROJECT_NAME}"
+        excludes:
+          - "**/Info.plist"
+          - "**/*Tests.swift"
+          - "**/*.{json,yml}"
+      - path: "${ROOT_DIR}/${PROJECT_NAME}"
+        buildPhase: none
+
+    dependencies:
+      - target: NotificationExtension
+        embed: true
+
+  NotificationExtension:
+    type: app-extension
+    platform: iOS
+    settings:
+      base:
+        TARGETED_DEVICE_FAMILY: 1
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: false
+        SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: false
+        SUPPORTS_MACCATALYST: false
+        MARKETING_VERSION: 1.0
+        CURRENT_PROJECT_VERSION: 1
+      configs:
+        Staging:
+          PRODUCT_BUNDLE_IDENTIFIER: "${IOS_STAGING_BUNDLE_ID}.notification"
+        Production:
+          PRODUCT_BUNDLE_IDENTIFIER: "${IOS_PRODUCTION_BUNDLE_ID}.notification"
+    sources:
+      - path: ${ROOT_DIR}/NotificationExtension
+        excludes:
+          - "**/Info.plist"
+
+  ${IOS_TARGET_NAME}-UnitTests:
+    type: bundle.unit-test
+    platform: iOS
+    settings:
+      base:
+        TARGETED_DEVICE_FAMILY: 1
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: false
+        SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: false
+        SUPPORTS_MACCATALYST: false
+      configs:
+        Staging:
+          PRODUCT_BUNDLE_IDENTIFIER: ${IOS_STAGING_BUNDLE_ID}
+        Production:
+          PRODUCT_BUNDLE_IDENTIFIER: ${IOS_PRODUCTION_BUNDLE_ID}
+    sources:
+      - path: ${ROOT_DIR}/AibaShop
+        includes:
+          - "**/*Tests.swift"
+    dependencies:
+      - target: ${IOS_TARGET_NAME}

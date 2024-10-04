@@ -1,0 +1,15 @@
+{
+  "images" : [
+    {
+      "filename" : "7-eleven_logo.svg.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  },
+  "properties" : {
+    "preserves-vector-representation" : true
+  }
+}
