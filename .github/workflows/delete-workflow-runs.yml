@@ -1,0 +1,24 @@
+name: Delete WorkFlow Runs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  delete-workflow-runs:
+    runs-on: macos-latest
+    permissions: write-all
+    steps:
+      - env:
+          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for ID in $(gh api --method GET "repos/$REPO/actions/runs?per_page=100" | jq -r '.workflow_runs[] | select(.conclusion != null) | [.id] | @tsv')
+          do
+            gh api \
+            --method DELETE \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/$REPO/actions/runs/$ID
+          done
+
+
