@@ -7,6 +7,7 @@ permissions:
   contents: write
   pull-requests: write
     
+    
 jobs:
   test1:
     name: Test 1
