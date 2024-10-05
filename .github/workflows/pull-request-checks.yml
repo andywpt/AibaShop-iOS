@@ -1,0 +1,29 @@
+name: Pull Request Checks
+on:
+  pull_request:
+    branches: [main, mock-main]
+    
+jobs:
+  test1:
+    name: Test 1
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Test1 passed"
+          
+  test2:
+    name: Test 2
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Test 2 passed"
+
+  all-checks-passed:  
+    if: always()
+    needs:
+      - test1
+      - test2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure all other jobs pass successfully.
+        uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
