@@ -2,7 +2,7 @@ name: Auto-merge Admin Pull Requests If Checks Pass
 
 on:
   pull_request:
-    branches: ['main', 'mock-main']
+    branches: ['test']
 
 permissions:
   contents: write
