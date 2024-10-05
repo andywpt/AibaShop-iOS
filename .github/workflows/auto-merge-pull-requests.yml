@@ -2,7 +2,7 @@ name: Auto-merge Admin Pull Requests If Checks Pass
 
 on:
   pull_request:
-    branches: ['main', 'chore/github-actions']
+    branches: ['main', 'mock-main']
 
 permissions:
   contents: write
@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Approve pull request
         run: |
-          gh pr review --comment -b "All chec"
+          gh pr review --comment -b "All checks passed ✅"
           gh pr review --approve "$PR_URL"
         
       - name: Squash merge
