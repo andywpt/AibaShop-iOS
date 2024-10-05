@@ -18,7 +18,6 @@ jobs:
     steps:
       - name: Approve pull request
         run: |
-          gh pr review --comment -b "All checks passed ✅"
           gh pr review --approve "$PR_URL"
         
       - name: Squash merge
