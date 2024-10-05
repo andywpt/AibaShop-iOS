@@ -62,7 +62,7 @@ jobs:
     name: Notify Result
     runs-on: macos-latest
     env:
-      APP_ID: ${{ vars.APP_ID }}
+      APP_ID: 6692622375
       ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
       RESULT: ${{ needs.upload_to_testflight.result }}
       GITHUB_REPO: ${{ github.repository }}
