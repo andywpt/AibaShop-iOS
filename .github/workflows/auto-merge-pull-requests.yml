@@ -1,8 +1,8 @@
-name: Auto-merge Pull Requests
+name: Auto-merge Admin Pull Requests If Checks Pass
 
 on:
   pull_request:
-    branches: ['main']
+    branches: ['main', 'chore/github-actions']
 
 permissions:
   contents: write
@@ -13,11 +13,13 @@ jobs:
     if: ${{ contains(fromJson('["dependabot[bot]", "andywpt"]'), github.actor) }}
     runs-on: ubuntu-latest
     env:
-      PR_URL: ${{github.event.pull_request.html_url}}
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      PR_URL: ${{github.event.pull_request.html_url}}
     steps:
       - name: Approve pull request
-        run: gh pr review --approve "$PR_URL"
+        run: |
+          gh pr review --comment -b "All chec"
+          gh pr review --approve "$PR_URL"
         
       - name: Squash merge
         run: gh pr merge --auto -s "$PR_URL"
