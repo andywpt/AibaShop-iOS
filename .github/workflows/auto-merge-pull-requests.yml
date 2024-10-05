@@ -9,16 +9,23 @@ permissions:
   pull-requests: write
 
 jobs:
-  dependabot:
+  auto-merge-if-all-checks-passed:
     if: ${{ contains(fromJson('["dependabot[bot]", "andywpt"]'), github.actor) }}
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      # GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       PR_URL: ${{github.event.pull_request.html_url}}
     steps:
-      - name: Approve pull request
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.ADMIN_BOT_APP_ID }}
+          private-key: ${{ secrets.ADMIN_BOT_KEY }}
+      - name: Approve and squash the pull request
+        env: 
+          TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
+          export GH_TOKEN=$TOKEN
+          gh auth status
           gh pr review --approve "$PR_URL"
-        
-      - name: Squash merge
-        run: gh pr merge --auto -s "$PR_URL"
+          gh pr merge --admin -s "$PR_URL"

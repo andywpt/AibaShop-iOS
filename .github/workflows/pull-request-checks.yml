@@ -1,4 +1,4 @@
-name: Pull Request Checks
+name: PR Checks
 on:
   pull_request:
     branches: [main, mock-main]
@@ -8,7 +8,9 @@ jobs:
     name: Test 1
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Test1 passed"
+      - run: |
+          sleep 5
+          echo "Test1 passed"
           
   test2:
     name: Test 2
@@ -16,7 +18,8 @@ jobs:
     steps:
       - run: echo "Test 2 passed"
 
-  all-checks-passed:  
+  all-checks-passed: 
+    name: All Checks Passed 
     if: always()
     needs:
       - test1
