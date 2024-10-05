@@ -7,7 +7,6 @@ passphrase
 /Configurations/Decrypted/
 /AibaShop/**/Config.swift
 
-
 ## App packaging
 .local_derived_data/
 *.ipa
