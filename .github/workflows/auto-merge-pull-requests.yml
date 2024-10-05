@@ -9,7 +9,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  dependabot:
+  auto-merge-if-all-checks-passed:
     if: ${{ contains(fromJson('["dependabot[bot]", "andywpt"]'), github.actor) }}
     runs-on: ubuntu-latest
     env:
