@@ -25,7 +25,7 @@ jobs:
         env: 
           TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          gh auth login --with-token $TOKEN
+          export GH_TOKEN=TOKEN
           gh auth status
           gh pr review --approve "$PR_URL"
           gh pr merge --auto -s "$PR_URL"
