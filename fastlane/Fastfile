@@ -137,6 +137,70 @@ platform :ios do
     end
  end
 
+ desc "Run tests"
+ lane :tests do 
+    ios_target_name = ENV['IOS_TARGET_NAME']
+    unit_test_taget_name = "#{ENV['IOS_TARGET_NAME']}-UnitTests"
+    scheme = "Production"
+    configuration = "Production-Debug"
+    targets = [ios_target_name, unit_test_taget_name]
+    derived_data_path = File.expand_path("../.local_derived_data")
+    cache_folder = File.expand_path("#{derived_data_path}/Build/Products/#{configuration}-iphonesimulator")
+    # Step 0) Check if cache exists 
+    if(File.exist?(cache_folder))
+      fastlane_require 'xcodeproj'
+      project = Xcodeproj::Project.open("../#{ENV["PROJECT_NAME"]}.xcodeproj")
+      targets.each do |target_name|
+        target = project.targets.select { |target| target.name == target_name }.first
+        # Find the build phase for embedding Pods frameworks
+        phase = target.shell_script_build_phases.select { |phase| phase.name && phase.name.include?('[CP] Embed Pods Frameworks') }.first
+        # Modify the shell script if it doesn't already start with BUILT_PRODUCTS_DIR
+        if phase && !phase.shell_script.start_with?('BUILT_PRODUCTS_DIR')
+          phase.shell_script = "BUILT_PRODUCTS_DIR=#{cache_folder} #{phase.shell_script}"
+          project.save
+        else
+        end
+      end
+
+      # target = project.targets.select { |target| target.name == ios_target_name }.first
+      # phase = target.shell_script_build_phases.select { |phase| phase.name && phase.name.include?('[CP] Embed Pods Frameworks') }.first
+      # if (!phase.shell_script.start_with?('BUILT_PRODUCTS_DIR'))
+      #   phase.shell_script = "BUILT_PRODUCTS_DIR=#{cache_folder} #{phase.shell_script}"
+      #   project.save()
+      # end
+      # Step 2) Build only .xcodeproj 
+      run_tests(
+        project: "#{ENV["PROJECT_NAME"]}.xcodeproj",
+        scheme: scheme,
+        xcargs: [
+          "PODS_CONFIGURATION_BUILD_DIR=#{cache_folder}",
+          "FRAMEWORK_SEARCH_PATHS='#{cache_folder}\ $(inherited)'",
+          "LIBRARY_SEARCH_PATHS='#{cache_folder}\ $(inherited)'",
+          "SWIFT_INCLUDE_PATHS=#{cache_folder}"
+        ].join(" ")
+      )
+    else
+      run_tests(
+        workspace: "#{ENV["PROJECT_NAME"]}.xcworkspace",
+        scheme: scheme,
+        derived_data_path: derived_data_path,
+      )
+      # Step 5) Remove non-Pods binaries to reduce cache size
+      require 'fileutils'
+      dirs = [
+        File.expand_path("#{derived_data_path}/info.plist"),
+        File.expand_path("#{derived_data_path}/Logs"),
+        File.expand_path("#{derived_data_path}/Index.noindex"),
+        File.expand_path("#{derived_data_path}/ModuleCache.noindex"),
+        File.expand_path("#{derived_data_path}/SDKStatCaches.noindex"),
+        File.expand_path("#{derived_data_path}/TestResults"),
+        File.expand_path("#{derived_data_path}/Build/Intermediates.noindex/XCBuildData"),
+        File.expand_path("#{derived_data_path}/Build/Intermediates.noindex/#{ENV["PROJECT_NAME"]}.build")
+      ]
+      dirs.each { |dir| FileUtils.rm_rf(dir) }
+    end
+ end
+
  lane :archive do
     create_api_token
     install_distribution_certificate

@@ -1,12 +1,12 @@
-name: Run unit tests
+name: Run tests
 
 on:
   workflow_dispatch:
   push:
 
 jobs:
-  run-unit-tests:
-    name: Run unit tests
+  run-tests:
+    name: Run tests
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -21,12 +21,17 @@ jobs:
       - name: Generate project
         run: |
           make
+
+      - name: Load cached Pod derived data
+        uses: actions/cache@v4
+        with:
+          path: .local_derived_data
+          key: test-pods-derived-data-${{ hashFiles('**/Podfile.lock') }}
       
       - name: Run unit tests
         run: |
-          xcodebuild test \
-          -workspace AibaShop.xcworkspace \
-          -scheme Production \
-          -sdk iphonesimulator \
-          -destination 'platform=iOS Simulator,name=iPhone 15,OS=18.0' \
-          | xcpretty
+          set -a && \
+          source fastlane/.fastlane.env && \
+          source Configurations/Decrypted/.fastlane.private.env && \
+          set +a && \
+          fastlane ios tests
