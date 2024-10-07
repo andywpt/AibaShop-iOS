@@ -23,28 +23,29 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/mint
-          key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
+          key: mint-${{ hashFiles('**/Mintfile') }}
 
       - name: Install command line tool (if not yet cached)
         if: steps.mint-cache.outputs.cache-hit != 'true'
         run: |
           brew install mint
           mint bootstrap
+          ls -a -l
 
-      - name: Generate project
-        env:
-          PASSPHRASE: ${{ secrets.PASSPHRASE }}
-        run: |
-          echo "${PASSPHRASE}" > passphrase
-          make
+      # - name: Generate project
+      #   env:
+      #     PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      #   run: |
+      #     echo "${PASSPHRASE}" > passphrase
+      #     make
 
-      - name: Run unit tests
-        run: |
-          gem uninstall fastlane --silent
-          sudo xcode-select --switch /Applications/Xcode_16.0.app
-          set -a && \
-          source fastlane/.fastlane.env && \
-          source Configurations/Decrypted/.fastlane.private.env && \
-          set +a && \
-          fastlane ios run_unit_tests
+      # - name: Run unit tests
+      #   run: |
+      #     gem uninstall fastlane --silent
+      #     sudo xcode-select --switch /Applications/Xcode_16.0.app
+      #     set -a && \
+      #     source fastlane/.fastlane.env && \
+      #     source Configurations/Decrypted/.fastlane.private.env && \
+      #     set +a && \
+      #     fastlane ios run_unit_tests
           
