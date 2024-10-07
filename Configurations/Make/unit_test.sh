@@ -4,10 +4,10 @@ latest_ios_version=$(xcrun simctl list devices | grep -oE 'iOS [0-9]+\.[0-9]+' |
 selected_version=${latest_ios_version#* }
 selected_model=$(xcrun simctl list devices | grep -A 10 --color=never "$latest_ios_version" | grep -oE 'iPhone [0-9]+' | sort -V | tail -n 1)
 
+cache_folder=$(readlink -f .local_derived_data/Build/Products/Production-Debug-iphonesimulator)
+
 echo "Running tests on simulator ($selected_model, $selected_version)..."
 start_time=$(date +%s)
-# Set the cache folder path
-cache_folder=$(readlink -f .local_derived_data/Build/Products/Production-Debug-iphonesimulator)
 
 # Check if the cache folder exists
 if [ -d "$cache_folder" ]; then
@@ -38,9 +38,16 @@ else
   | xcpretty
 fi
 end_time=$(date +%s)
+# Calculate total execution time
+total_seconds=$(( end_time - start_time ))
 
-# Calculate execution time
-execution_time=$((end_time - start_time))
+# Extract minutes and seconds
+minutes=$(( total_seconds / 60 ))
+seconds=$(( total_seconds % 60 ))
 
-# Log the execution time
-echo "⌛️ Execution time: $execution_time seconds"
+# Log the execution time conditionally
+if [ "$total_seconds" -lt 60 ]; then
+    echo "⌛️ Execution time: $seconds seconds"
+else
+    echo "⌛️ Execution time: $minutes minutes $seconds seconds"
+fi
