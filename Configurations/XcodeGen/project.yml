@@ -17,7 +17,7 @@ options:
     touch AibaShop/Resources/Configs/Config.swift
 
   postGenCommand: |
-    pod install
+    bundle exec pod install
 
 fileGroups:
   - ${ROOT_DIR}/Configurations
