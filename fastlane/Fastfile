@@ -195,8 +195,7 @@ platform :ios do
           "PODS_CONFIGURATION_BUILD_DIR=#{cache_folder}",
           "FRAMEWORK_SEARCH_PATHS='#{cache_folder}\ $(inherited)'",
           "LIBRARY_SEARCH_PATHS='#{cache_folder}\ $(inherited)'",
-          "SWIFT_INCLUDE_PATHS=#{cache_folder}",
-          "CODE_SIGNING_ALLOWED=NO"
+          "SWIFT_INCLUDE_PATHS=#{cache_folder}"
         ].join(" ")
       )
     else
@@ -205,10 +204,7 @@ platform :ios do
         scheme: scheme,
         configuration: configuration,
         derived_data_path: derived_data_path,
-        max_concurrent_simulators: 1,
-        xcargs: [
-          "CODE_SIGNING_ALLOWED=NO"
-        ].join(" ")
+        max_concurrent_simulators: 1
       )
       # Step 5) Remove non-Pods binaries to reduce cache size
       # require 'fileutils'
