@@ -27,7 +27,9 @@ jobs:
 
       - name: Install command line tool (if not yet cached)
         if: steps.mint-cache.outputs.cache-hit != 'true'
-        run: mint bootstrap
+        run: |
+          brew install mint
+          mint bootstrap
 
       - name: Generate project
         env:
