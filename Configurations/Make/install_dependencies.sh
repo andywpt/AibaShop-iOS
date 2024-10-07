@@ -5,7 +5,7 @@ if ! command -v brew &> /dev/null; then
     exit 1
 fi
 
-# brew update --quiet
+brew update --quiet
 packages=(gnupg cocoapods fastlane swiftformat swiftgen sourcery xcodegen)
 for package in "${packages[@]}"; do
     brew upgrade --formula "$package" || brew install --formula "$package" || true
