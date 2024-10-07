@@ -1,5 +1,4 @@
 #!/bin/bash
-
 if ! command -v brew &> /dev/null; then
     echo "Homebrew not installed. Please install it first."
     exit 1
