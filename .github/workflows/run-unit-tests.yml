@@ -11,26 +11,37 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up ruby environment
+        uses: ruby/setup-ruby@v1.138.0
+        with:
+          ruby-version: 3.2.1
+          bundler-cache: true
       
-      - name: Load cached Pod derived data
-        uses: actions/cache@v4
-        with:
-          path: .local_derived_data
-          key: test-pods-derived-data-${{ hashFiles('**/Podfile.lock') }}
-
-      - name: Cache/Restore Mint packages
-        id: mint-cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ github.workspace }}/mint
-          key: mint-${{ hashFiles('**/Mintfile') }}
-
-      - name: Install command line tool (if not yet cached)
-        if: steps.mint-cache.outputs.cache-hit != 'true'
+      - name: Install gems
         run: |
-          brew install mint
-          mint bootstrap
-          ls -a -l
+          bundle install
+    
+      
+      # - name: Load cached Pod derived data
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: .local_derived_data
+      #     key: test-pods-derived-data-${{ hashFiles('**/Podfile.lock') }}
+
+      # - name: Cache/Restore Mint packages
+      #   id: mint-cache
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ${{ github.workspace }}/mint
+      #     key: mint-${{ hashFiles('**/Mintfile') }}
+
+      # - name: Install command line tool (if not yet cached)
+      #   if: steps.mint-cache.outputs.cache-hit != 'true'
+      #   run: |
+      #     brew install mint
+      #     mint bootstrap
+      #     ls -a -l
 
       # - name: Generate project
       #   env:
