@@ -192,7 +192,7 @@ platform :ios do
       #   project.save()
       # end
       # Step 2) Build only .xcodeproj 
-      run_tests(
+      scan(
         project: "#{ENV["PROJECT_NAME"]}.xcodeproj",
         scheme: scheme,
         xcargs: [
@@ -203,7 +203,7 @@ platform :ios do
         ].join(" ")
       )
     else
-      run_tests(
+      scan(
         workspace: "#{ENV["PROJECT_NAME"]}.xcworkspace",
         scheme: scheme,
         derived_data_path: derived_data_path,
@@ -226,6 +226,7 @@ platform :ios do
  end
 
  lane :run_unit_tests do
+  xcversion(version: "16.0")
   create_api_token
   install_certificate(certificate_path: ENV["DEVELOPMENT_CERTIFICATE_PATH"])
   configure_development_signing_settings
