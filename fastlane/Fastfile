@@ -189,7 +189,6 @@ platform :ios do
       scan(
         project: "#{ENV["PROJECT_NAME"]}.xcodeproj",
         scheme: scheme,
-        configuration: configuration,
         max_concurrent_simulators: 1,
         xcargs: [
           "PODS_CONFIGURATION_BUILD_DIR=#{cache_folder}",
@@ -202,7 +201,6 @@ platform :ios do
       scan(
         workspace: "#{ENV["PROJECT_NAME"]}.xcworkspace",
         scheme: scheme,
-        configuration: configuration,
         derived_data_path: derived_data_path,
         max_concurrent_simulators: 1
       )

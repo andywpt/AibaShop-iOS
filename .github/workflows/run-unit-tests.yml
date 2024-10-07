@@ -11,15 +11,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Load passphrase from secrets
+        
+      - name: Generate project
         env:
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
         run: |
           echo "${PASSPHRASE}" > passphrase
-
-      - name: Generate project
-        run: |
           make
 
       - name: Load cached Pod derived data
