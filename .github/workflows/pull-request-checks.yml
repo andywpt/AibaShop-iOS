@@ -15,20 +15,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Load passphrase from secrets
-        env:
-          PASSPHRASE: ${{ secrets.PASSPHRASE }}
-        run: |
-          echo "${PASSPHRASE}" > passphrase
-
-      - name: Generate project
-        run: make
-
       - name: Load cached Pod derived data
         uses: actions/cache@v4
         with:
           path: .local_derived_data
           key: test-pods-derived-data-${{ hashFiles('**/Podfile.lock') }}
+
+      - name: Generate project
+        env:
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+        run: |
+          echo "${PASSPHRASE}" > passphrase
+          make
       
       - name: Run unit tests
         run: |
