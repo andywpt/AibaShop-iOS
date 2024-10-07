@@ -38,4 +38,4 @@ jobs:
           set +a && \
           fastlane ios run_unit_tests
           chmod +x Configurations/Make/unit_test.sh
-          Configurations/Make/unit_test.sh
+          

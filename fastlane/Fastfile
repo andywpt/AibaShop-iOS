@@ -192,22 +192,22 @@ platform :ios do
       #   project.save()
       # end
       # Step 2) Build only .xcodeproj 
-      # scan(
-      #   project: "#{ENV["PROJECT_NAME"]}.xcodeproj",
-      #   scheme: scheme,
-      #   xcargs: [
-      #     "PODS_CONFIGURATION_BUILD_DIR=#{cache_folder}",
-      #     "FRAMEWORK_SEARCH_PATHS='#{cache_folder}\ $(inherited)'",
-      #     "LIBRARY_SEARCH_PATHS='#{cache_folder}\ $(inherited)'",
-      #     "SWIFT_INCLUDE_PATHS=#{cache_folder}"
-      #   ].join(" ")
-      # )
+      scan(
+        project: "#{ENV["PROJECT_NAME"]}.xcodeproj",
+        scheme: scheme,
+        xcargs: [
+          "PODS_CONFIGURATION_BUILD_DIR=#{cache_folder}",
+          "FRAMEWORK_SEARCH_PATHS='#{cache_folder}\ $(inherited)'",
+          "LIBRARY_SEARCH_PATHS='#{cache_folder}\ $(inherited)'",
+          "SWIFT_INCLUDE_PATHS=#{cache_folder}"
+        ].join(" ")
+      )
     else
-      # scan(
-      #   workspace: "#{ENV["PROJECT_NAME"]}.xcworkspace",
-      #   scheme: scheme,
-      #   derived_data_path: derived_data_path,
-      # )
+      scan(
+        workspace: "#{ENV["PROJECT_NAME"]}.xcworkspace",
+        scheme: scheme,
+        derived_data_path: derived_data_path,
+      )
       # Step 5) Remove non-Pods binaries to reduce cache size
       # require 'fileutils'
       # dirs = [
