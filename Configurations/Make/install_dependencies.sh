@@ -4,11 +4,11 @@ if ! command -v brew &> /dev/null; then
     echo "Homebrew not installed. Please install it first."
     exit 1
 fi
-
-#brew update --quiet
+export HOMEBREW_NO_AUTO_UPDATE=1
+brew update --quiet
 packages=(gnupg cocoapods fastlane swiftformat swiftgen sourcery xcodegen)
 for package in "${packages[@]}"; do
-    brew upgrade --formula "$package" || brew install --formula "$package" || true
+    brew install --formula "$package" || true
 done
 
 title="Summary for Brew Packages"
