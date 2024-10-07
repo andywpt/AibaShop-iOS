@@ -10,7 +10,7 @@ permissions:
 jobs:
   run-tests:
     name: Run tests
-    runs-on: flyci-macos-large-latest-m2
+    runs-on: flyci-macos-xlarge-latest-m2
     steps:
       - name: Checkout
         uses: actions/checkout@v4
