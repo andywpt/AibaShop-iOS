@@ -184,12 +184,13 @@ platform :ios do
         else
         end
       end
-      
+
       # Step 2) Build only .xcodeproj 
       scan(
         project: "#{ENV["PROJECT_NAME"]}.xcodeproj",
         scheme: scheme,
         configuration: configuration,
+        max_concurrent_simulators: 1,
         xcargs: [
           "PODS_CONFIGURATION_BUILD_DIR=#{cache_folder}",
           "FRAMEWORK_SEARCH_PATHS='#{cache_folder}\ $(inherited)'",
@@ -204,6 +205,7 @@ platform :ios do
         scheme: scheme,
         configuration: configuration,
         derived_data_path: derived_data_path,
+        max_concurrent_simulators: 1,
         xcargs: [
           "CODE_SIGNING_ALLOWED=NO"
         ].join(" ")
