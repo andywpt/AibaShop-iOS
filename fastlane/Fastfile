@@ -9,11 +9,12 @@ platform :ios do
    )
  end
 
- desc "Install distribution certificate in the keychain"
- lane :install_distribution_certificate do
+ desc "Install certificate in keychain"
+ lane :install_certificate do |options|
    keychain_name = "signing"
    keychain_password = ""
-
+   certificate_path = options[:certificate_path]
+   
    delete_keychain(
      name: keychain_name
    ) if File.exist? File.expand_path("~/Library/Keychains/#{keychain_name}-db")
@@ -28,7 +29,7 @@ platform :ios do
    )
 
    import_certificate(
-     certificate_path: ENV["APPLE_CERTIFICATE_PATH"],
+     certificate_path: certificate_path,
      keychain_name: keychain_name,
      keychain_password: keychain_password,
      log_output: true
@@ -36,7 +37,7 @@ platform :ios do
  end
  
  desc "Configure code signing settings in Xcode before build"
- lane :configure_signing_settings do |options|
+ lane :configure_distribution_signing_settings do |options|
 
     sigh(app_identifier: ENV['IOS_PRODUCTION_BUNDLE_ID'])
 
@@ -52,6 +53,28 @@ platform :ios do
     update_code_signing_settings(
       targets: ["NotificationExtension"],
       code_sign_identity: "iPhone Distribution",
+      team_id: ENV['TEAM_ID'],
+      profile_uuid: lane_context[SharedValues::SIGH_UUID] 
+    )
+ end
+ 
+ desc "Configure code signing settings in Xcode before build"
+ lane :configure_development_signing_settings do |options|
+
+    sigh(app_identifier: ENV['IOS_PRODUCTION_BUNDLE_ID'])
+
+    update_code_signing_settings(
+      targets: [ENV['IOS_TARGET_NAME'], "#{ENV['IOS_TARGET_NAME']}-UnitTests"],
+      code_sign_identity: "iPhone Developer",
+      team_id: ENV['DEVELOPMENT_TEAM'],
+      profile_uuid: lane_context[SharedValues::SIGH_UUID] 
+    )
+  
+    sigh(app_identifier: "com.aibashop.ios.notification")
+
+    update_code_signing_settings(
+      targets: ["NotificationExtension"],
+      code_sign_identity: "iPhone Developer",
       team_id: ENV['TEAM_ID'],
       profile_uuid: lane_context[SharedValues::SIGH_UUID] 
     )
@@ -138,7 +161,7 @@ platform :ios do
  end
 
  desc "Run tests"
- lane :tests do 
+ private_lane :tests do 
     ios_target_name = ENV['IOS_TARGET_NAME']
     unit_test_taget_name = "#{ENV['IOS_TARGET_NAME']}-UnitTests"
     scheme = "Production"
@@ -202,10 +225,17 @@ platform :ios do
     end
  end
 
+ lane :run_unit_tests do
+  create_api_token
+  install_certificate(certificate_path: ENV["DEVELOPMENT_CERTIFICATE_PATH"])
+  configure_development_signing_settings
+  tests
+ end
+
  lane :archive do
     create_api_token
-    install_distribution_certificate
-    configure_signing_settings
+    install_certificate(certificate_path: ENV["DISTRIBUTION_CERTIFICATE_PATH"])
+    configure_distribution_signing_settings
     update_app_build_number
     archive_app
  end

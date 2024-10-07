@@ -30,10 +30,9 @@ jobs:
       
       - name: Run unit tests
         run: |
-        
           gem uninstall fastlane --silent
           set -a && \
           source fastlane/.fastlane.env && \
           source Configurations/Decrypted/.fastlane.private.env && \
           set +a && \
-          fastlane ios tests
+          fastlane ios run_unit_tests
