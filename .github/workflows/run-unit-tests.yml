@@ -31,8 +31,11 @@ jobs:
       - name: Run unit tests
         run: |
           gem uninstall fastlane --silent
+          sudo xcode-select --switch /Applications/Xcode_16.0.app
+          xcrun simctl list devices
           set -a && \
           source fastlane/.fastlane.env && \
           source Configurations/Decrypted/.fastlane.private.env && \
           set +a && \
           fastlane ios run_unit_tests
+          Configurations/Make/unit_test.sh
