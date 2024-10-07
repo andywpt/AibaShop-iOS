@@ -19,14 +19,13 @@ jobs:
           bundler-cache: true
       
       - name: Install gems
-        run: |
-          bundle install
+        run: bundle install
       
-      # - name: Load cached Pod derived data
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: .local_derived_data
-      #     key: test-pods-derived-data-${{ hashFiles('**/Podfile.lock') }}
+      - name: Load cached Pod derived data
+        uses: actions/cache@v4
+        with:
+          path: .local_derived_data
+          key: test-pods-derived-data-${{ hashFiles('**/Podfile.lock') }}
 
       # - name: Cache/Restore Mint packages
       #   id: mint-cache
@@ -42,20 +41,20 @@ jobs:
       #     mint bootstrap
       #     ls -a -l
 
-      # - name: Generate project
-      #   env:
-      #     PASSPHRASE: ${{ secrets.PASSPHRASE }}
-      #   run: |
-      #     echo "${PASSPHRASE}" > passphrase
-      #     make
+      - name: Generate project
+        env:
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+        run: |
+          echo "${PASSPHRASE}" > passphrase
+          make
 
-      # - name: Run unit tests
-      #   run: |
-      #     gem uninstall fastlane --silent
-      #     sudo xcode-select --switch /Applications/Xcode_16.0.app
-      #     set -a && \
-      #     source fastlane/.fastlane.env && \
-      #     source Configurations/Decrypted/.fastlane.private.env && \
-      #     set +a && \
-      #     fastlane ios run_unit_tests
+      - name: Run unit tests
+        run: |
+          gem uninstall fastlane --silent
+          sudo xcode-select --switch /Applications/Xcode_16.0.app
+          set -a && \
+          source fastlane/.fastlane.env && \
+          source Configurations/Decrypted/.fastlane.private.env && \
+          set +a && \
+          bundle exec fastlane ios run_unit_tests
           
