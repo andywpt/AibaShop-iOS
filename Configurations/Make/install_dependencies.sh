@@ -11,6 +11,7 @@ for package in "${packages[@]}"; do
     brew install --formula "$package" || true
 done
 
+
 title="Summary for Brew Packages"
 headers=("Name" "Installed Version" "Latest Version")
 output=$(brew info --json "${packages[@]}" |
