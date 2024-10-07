@@ -27,7 +27,7 @@ fi
 arguments=$(sed -n 's/=/ /p' $file | awk '{printf "%s=\"%s\",", $1, $2}' | sed 's/,$//')
 
 # Codegen
-sourcery \
+mint run sourcery \
     --templates $TEMPLATE_PATH \
     --sources $OUTPUT_PATH \
     --output $OUTPUT_PATH \
