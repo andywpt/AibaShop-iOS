@@ -16,4 +16,4 @@ generate_project:
 	set -a && \
 	source Configurations/XcodeGen/.xcodegen.env && \
 	set +a && \
-	mint run xcodegen generate --spec Configurations/XcodeGen/project.yml --project ./
+	xcodegen generate --spec Configurations/XcodeGen/project.yml --project ./
