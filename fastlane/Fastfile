@@ -194,7 +194,9 @@ platform :ios do
           "PODS_CONFIGURATION_BUILD_DIR=#{cache_folder}",
           "FRAMEWORK_SEARCH_PATHS='#{cache_folder}\ $(inherited)'",
           "LIBRARY_SEARCH_PATHS='#{cache_folder}\ $(inherited)'",
-          "SWIFT_INCLUDE_PATHS=#{cache_folder}"
+          "SWIFT_INCLUDE_PATHS=#{cache_folder}",
+          "CODE_SIGNING_ALLOWED=NO",
+          "CODE_SIGNING_REQUIRED=NO"
         ].join(" ")
       )
     else
@@ -221,8 +223,8 @@ platform :ios do
 
  lane :run_unit_tests do
   create_api_token
-  install_certificate(certificate_path: ENV["DEVELOPMENT_CERTIFICATE_PATH"])
-  configure_development_signing_settings
+  #install_certificate(certificate_path: ENV["DEVELOPMENT_CERTIFICATE_PATH"])
+  #configure_development_signing_settings
   tests
  end
 
