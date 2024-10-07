@@ -189,7 +189,6 @@ platform :ios do
         project: "#{ENV["PROJECT_NAME"]}.xcodeproj",
         scheme: scheme,
         configuration: configuration,
-        prelaunch_simulator: true,
         xcargs: [
           "PODS_CONFIGURATION_BUILD_DIR=#{cache_folder}",
           "FRAMEWORK_SEARCH_PATHS='#{cache_folder}\ $(inherited)'",
@@ -201,7 +200,6 @@ platform :ios do
       scan(
         workspace: "#{ENV["PROJECT_NAME"]}.xcworkspace",
         scheme: scheme,
-        prelaunch_simulator: true,
         configuration: configuration,
         derived_data_path: derived_data_path,
       )
