@@ -1,7 +1,7 @@
 opt_out_usage
 platform :ios do
  desc "Load App Store Connect API token"
- lane :create_api_token do
+ private_lane :create_api_token do
    app_store_connect_api_key(
      key_id: ENV["APPSTORE_API_KEY_ID"],
      issuer_id: ENV["APPSTORE_API_ISSUER_ID"],
@@ -10,7 +10,7 @@ platform :ios do
  end
 
  desc "Install certificate in keychain"
- lane :install_certificate do |options|
+ private_lane :install_certificate do |options|
    keychain_name = "signing"
    keychain_password = ""
    certificate_path = options[:certificate_path]
@@ -59,9 +59,9 @@ platform :ios do
  end
  
  desc "Configure code signing settings in Xcode before build"
- lane :configure_development_signing_settings do |options|
+ private_lane :configure_development_signing_settings do |options|
 
-    sigh(app_identifier: ENV['IOS_PRODUCTION_BUNDLE_ID'])
+    sigh(app_identifier: ENV['IOS_PRODUCTION_BUNDLE_ID'], development: true)
 
     update_code_signing_settings(
       targets: [ENV['IOS_TARGET_NAME'], "#{ENV['IOS_TARGET_NAME']}-UnitTests"],
@@ -70,7 +70,7 @@ platform :ios do
       profile_uuid: lane_context[SharedValues::SIGH_UUID] 
     )
   
-    sigh(app_identifier: "com.aibashop.ios.notification")
+    sigh(app_identifier: "com.aibashop.ios.notification", development: true)
 
     update_code_signing_settings(
       targets: ["NotificationExtension"],
@@ -81,7 +81,7 @@ platform :ios do
  end
 
  desc "Increment app build number"
- lane :update_app_build_number do
+ private_lane :update_app_build_number do
    current_version = get_version_number(target: ENV['IOS_TARGET_NAME'])
    latest_build_number = latest_testflight_build_number(version: current_version)
    increment_build_number(build_number: (latest_build_number + 1))
