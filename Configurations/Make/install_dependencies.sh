@@ -7,7 +7,7 @@ fi
 export HOMEBREW_NO_AUTO_UPDATE=1
 export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
 brew update --quiet
-packages=(gnupg mint cocoapods fastlane swiftformat swiftgen sourcery xcodegen)
+packages=(gnupg mint cocoapods fastlane)
 for package in "${packages[@]}"; do
     brew install --formula "$package" || true
 done
