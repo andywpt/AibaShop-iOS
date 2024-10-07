@@ -195,7 +195,8 @@ platform :ios do
         File.expand_path("#{derived_data_path}/SDKStatCaches.noindex"),
         File.expand_path("#{derived_data_path}/TestResults"),
         File.expand_path("#{derived_data_path}/Build/Intermediates.noindex/XCBuildData"),
-        File.expand_path("#{derived_data_path}/Build/Intermediates.noindex/#{ENV["PROJECT_NAME"]}.build")
+        File.expand_path("#{derived_data_path}/Build/Intermediates.noindex/#{ENV["PROJECT_NAME"]}.build"),
+        File.expand_path("#{cache_folder}/#{ENV['IOS_TARGET_NAME']}")
       ]
       dirs.each { |dir| FileUtils.rm_rf(dir) }
     end
