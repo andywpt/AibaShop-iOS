@@ -5,7 +5,7 @@ selected_version=${latest_ios_version#* }
 selected_model=$(xcrun simctl list devices | grep -A 10 --color=never "$latest_ios_version" | grep -oE 'iPhone [0-9]+' | sort -V | tail -n 1)
 
 echo "Running tests on simulator ($selected_model, $selected_version)..."
-
+start_time=$(date +%s)
 # Set the cache folder path
 cache_folder=$(readlink -f .local_derived_data/Build/Products/Production-Debug-iphonesimulator)
 
@@ -37,3 +37,10 @@ else
     -derivedDataPath .local_derived_data \
   | xcpretty
 fi
+end_time=$(date +%s)
+
+# Calculate execution time
+execution_time=$((end_time - start_time))
+
+# Log the execution time
+echo "⌛️ Execution time: $execution_time seconds"

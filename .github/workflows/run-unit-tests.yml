@@ -32,7 +32,6 @@ jobs:
         run: |
           gem uninstall fastlane --silent
           sudo xcode-select --switch /Applications/Xcode_16.0.app
-          xcrun simctl list devices
           set -a && \
           source fastlane/.fastlane.env && \
           source Configurations/Decrypted/.fastlane.private.env && \
