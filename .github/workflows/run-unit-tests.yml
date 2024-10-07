@@ -30,6 +30,7 @@ jobs:
       
       - name: Run unit tests
         run: |
+        
           gem uninstall fastlane --silent
           set -a && \
           source fastlane/.fastlane.env && \
