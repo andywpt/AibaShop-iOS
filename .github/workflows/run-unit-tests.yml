@@ -11,13 +11,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      
+      - name: Load cached Pod derived data
+        uses: actions/cache@v4
+        with:
+          path: .local_derived_data
+          key: test-pods-derived-data-${{ hashFiles('**/Podfile.lock') }}
 
       - name: Cache/Restore Mint packages
         id: mint-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
-            path: ${{ github.workspace }}/mint
-            key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
+          path: ${{ github.workspace }}/mint
+          key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
+
+      - name: Install command line tool (if not yet cached)
+        if: steps.mint-cache.outputs.cache-hit != 'true'
+        run: mint bootstrap
 
       - name: Generate project
         env:
@@ -26,16 +36,6 @@ jobs:
           echo "${PASSPHRASE}" > passphrase
           make
 
-      - name: Install command line tool (if not yet cached)
-        if: steps.mint-cache.outputs.cache-hit != 'true'
-        run: mint bootstrap
-  
-      - name: Load cached Pod derived data
-        uses: actions/cache@v4
-        with:
-          path: .local_derived_data
-          key: test-pods-derived-data-${{ hashFiles('**/Podfile.lock') }}
-      
       - name: Run unit tests
         run: |
           gem uninstall fastlane --silent
