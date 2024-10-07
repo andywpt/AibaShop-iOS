@@ -184,6 +184,7 @@ platform :ios do
         else
         end
       end
+      
       # Step 2) Build only .xcodeproj 
       scan(
         project: "#{ENV["PROJECT_NAME"]}.xcodeproj",
