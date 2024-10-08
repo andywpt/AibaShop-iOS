@@ -1,8 +1,8 @@
-name: Run tests
+name: Update Cache If Needed
 
 on:
-  workflow_dispatch:
-  push:
+  push: 
+    branches: main
 
 jobs:
   run-tests:
@@ -26,12 +26,14 @@ jobs:
           make
 
       - name: Cache/Restore Pod derived data
+        id: pod-cache
         uses: actions/cache@v4
         with:
           path: .local_derived_data
           key: test-pods-derived-data-${{ hashFiles('**/Podfile.lock') }}
   
       - name: Run unit tests
+        if: steps.pod-cache.outputs.cache-hit != 'true'
         run: |
           sudo xcode-select --switch /Applications/Xcode_16.0.app
           set -a && \
