@@ -1,7 +1,7 @@
 platform :ios, ENV['MINIMUM_IOS_VERSION']
 
-project '../../AibaShop.xcodeproj'
-workspace '../../AibaShop.xcworkspace'
+# project '../../AibaShop.xcodeproj'
+# workspace '../../AibaShop.xcworkspace'
 
 target ENV['IOS_TARGET_NAME'] do
   # Comment the next line if you don't want to use dynamic frameworks
