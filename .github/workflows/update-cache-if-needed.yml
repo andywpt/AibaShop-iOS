@@ -1,4 +1,4 @@
-name: Update Cache If Needed
+name: Update Cache On Main Branch
 
 on:
   push: 
