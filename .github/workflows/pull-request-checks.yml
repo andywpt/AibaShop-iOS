@@ -8,25 +8,45 @@ permissions:
   pull-requests: write
     
 jobs:
-  test1:
-    name: Test 1
-    runs-on: ubuntu-latest
+  run-tests:
+    name: Run tests
+    runs-on: macos-latest
     steps:
-      - run: |
-          echo "Test1 passed"
-  test2:
-    name: Test 2
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          echo "Test 2 passed"
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up ruby environment
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2.1
+          bundler-cache: true
+      
+      - name: Generate project
+        env:
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+        run: |
+          echo "${PASSPHRASE}" > passphrase
+          make
+
+      - name: Cache/Restore Pod derived data
+        uses: actions/cache@v4
+        with:
+          path: .local_derived_data
+          key: test-pods-derived-data-${{ hashFiles('**/Podfile.lock') }}
+  
+      - name: Run unit tests
+        run: |
+          sudo xcode-select --switch /Applications/Xcode_16.0.app
+          set -a && \
+          source fastlane/.fastlane.env && \
+          source Configurations/Decrypted/.fastlane.private.env && \
+          set +a && \
+          bundle exec fastlane ios run_unit_tests
 
   all-checks-passed: 
     name: All Checks Passed 
     if: always()
-    needs:
-      - test1
-      - test2
+    needs: run-tests
     runs-on: ubuntu-latest
     steps:
       - name: Ensure all required jobs pass successfully

@@ -13,9 +13,11 @@ options:
   deploymentTarget:
     iOS: ${MINIMUM_IOS_VERSION}
   preGenCommand: |
+    mkdir -p AibaShop/Resources/Configs
     touch AibaShop/Resources/Configs/Config.swift
+
   postGenCommand: |
-    cd Configurations/CocoaPods && pod install
+    bundle exec pod install
 
 fileGroups:
   - ${ROOT_DIR}/Configurations

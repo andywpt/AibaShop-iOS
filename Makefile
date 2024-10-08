@@ -2,15 +2,16 @@
 default: setup
 
 setup: \
+  install_dependencies \
 	decrypt_files \
-	install_dependencies \
-	generate_project \
+	generate_project
+
+install_dependencies:
+	bundle install
+	Configurations/Make/install_dependencies.sh
 
 decrypt_files:
 	Configurations/Make/decrypt.sh
-
-install_dependencies:
-	Configurations/Make/install_dependencies.sh
 
 generate_project:
 	set -a && \

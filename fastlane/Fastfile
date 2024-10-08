@@ -1,7 +1,7 @@
 opt_out_usage
 platform :ios do
  desc "Load App Store Connect API token"
- lane :create_api_token do
+ private_lane :create_api_token do
    app_store_connect_api_key(
      key_id: ENV["APPSTORE_API_KEY_ID"],
      issuer_id: ENV["APPSTORE_API_ISSUER_ID"],
@@ -9,11 +9,12 @@ platform :ios do
    )
  end
 
- desc "Install distribution certificate in the keychain"
- lane :install_distribution_certificate do
+ desc "Install certificate in keychain"
+ private_lane :install_certificate do |options|
    keychain_name = "signing"
    keychain_password = ""
-
+   certificate_path = options[:certificate_path]
+   
    delete_keychain(
      name: keychain_name
    ) if File.exist? File.expand_path("~/Library/Keychains/#{keychain_name}-db")
@@ -28,7 +29,7 @@ platform :ios do
    )
 
    import_certificate(
-     certificate_path: ENV["APPLE_CERTIFICATE_PATH"],
+     certificate_path: certificate_path,
      keychain_name: keychain_name,
      keychain_password: keychain_password,
      log_output: true
@@ -36,7 +37,7 @@ platform :ios do
  end
  
  desc "Configure code signing settings in Xcode before build"
- lane :configure_signing_settings do |options|
+ lane :configure_distribution_signing_settings do |options|
 
     sigh(app_identifier: ENV['IOS_PRODUCTION_BUNDLE_ID'])
 
@@ -56,9 +57,9 @@ platform :ios do
       profile_uuid: lane_context[SharedValues::SIGH_UUID] 
     )
  end
-
+ 
  desc "Increment app build number"
- lane :update_app_build_number do
+ private_lane :update_app_build_number do
    current_version = get_version_number(target: ENV['IOS_TARGET_NAME'])
    latest_build_number = latest_testflight_build_number(version: current_version)
    increment_build_number(build_number: (latest_build_number + 1))
@@ -137,10 +138,75 @@ platform :ios do
     end
  end
 
+ desc "Run tests"
+ private_lane :tests do 
+    ios_target_name = ENV['IOS_TARGET_NAME']
+    unit_test_taget_name = "#{ENV['IOS_TARGET_NAME']}-UnitTests"
+    scheme = "Production"
+    configuration = "Production-Debug"
+    targets = [ios_target_name, unit_test_taget_name]
+    derived_data_path = File.expand_path("../.local_derived_data")
+    cache_folder = File.expand_path("#{derived_data_path}/Build/Products/#{configuration}-iphonesimulator")
+    # Step 0) Check if cache exists 
+    if(File.exist?(cache_folder))
+      fastlane_require 'xcodeproj'
+      project = Xcodeproj::Project.open("../#{ENV["PROJECT_NAME"]}.xcodeproj")
+      targets.each do |target_name|
+        target = project.targets.select { |target| target.name == target_name }.first
+        # Find the build phase for embedding Pods frameworks
+        phase = target.shell_script_build_phases.select { |phase| phase.name && phase.name.include?('[CP] Embed Pods Frameworks') }.first
+        # Modify the shell script if it doesn't already start with BUILT_PRODUCTS_DIR
+        if phase && !phase.shell_script.start_with?('BUILT_PRODUCTS_DIR')
+          phase.shell_script = "BUILT_PRODUCTS_DIR=#{cache_folder} #{phase.shell_script}"
+          project.save
+        else
+        end
+      end
+
+      # Step 2) Build only .xcodeproj 
+      scan(
+        project: "#{ENV["PROJECT_NAME"]}.xcodeproj",
+        scheme: scheme,
+        max_concurrent_simulators: 1,
+        xcargs: [
+          "PODS_CONFIGURATION_BUILD_DIR=#{cache_folder}",
+          "FRAMEWORK_SEARCH_PATHS='#{cache_folder}\ $(inherited)'",
+          "LIBRARY_SEARCH_PATHS='#{cache_folder}\ $(inherited)'",
+          "SWIFT_INCLUDE_PATHS=#{cache_folder}",
+          "CODE_SIGNING_ALLOWED=NO",
+          "CODE_SIGNING_REQUIRED=NO"
+        ].join(" ")
+      )
+    else
+      scan(
+        workspace: "#{ENV["PROJECT_NAME"]}.xcworkspace",
+        scheme: scheme,
+        derived_data_path: derived_data_path,
+        max_concurrent_simulators: 1
+      )
+      # Step 5) Remove non-Pods binaries to reduce cache size
+      require 'fileutils'
+      dirs = [
+        File.expand_path("#{derived_data_path}/info.plist"),
+        File.expand_path("#{derived_data_path}/Logs"),
+        File.expand_path("#{derived_data_path}/Index.noindex"),
+        File.expand_path("#{derived_data_path}/ModuleCache.noindex"),
+        File.expand_path("#{derived_data_path}/TestResults"),
+        File.expand_path("#{derived_data_path}/Build/Intermediates.noindex"),
+        File.expand_path("#{cache_folder}/#{ENV['IOS_TARGET_NAME']}")
+      ]
+      dirs.each { |dir| FileUtils.rm_rf(dir) }
+    end
+ end
+
+ lane :run_unit_tests do
+  tests
+ end
+
  lane :archive do
     create_api_token
-    install_distribution_certificate
-    configure_signing_settings
+    install_certificate(certificate_path: ENV["DISTRIBUTION_CERTIFICATE_PATH"])
+    configure_distribution_signing_settings
     update_app_build_number
     archive_app
  end
