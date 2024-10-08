@@ -24,6 +24,7 @@ jobs:
         with:
           path: .local_derived_data
           key: test-pods-derived-data-${{ hashFiles('**/Podfile.lock') }}
+          lookup-only: true
 
       - name: Generate project
         if: steps.pod-cache.outputs.cache-hit != 'true'

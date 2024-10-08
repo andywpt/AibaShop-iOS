@@ -4,8 +4,6 @@ if ! command -v brew &> /dev/null; then
     exit 1
 fi
 export HOMEBREW_NO_AUTO_UPDATE=1
-export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
-# brew update --quiet
 packages=(gnupg swiftformat swiftgen sourcery xcodegen)
 for package in "${packages[@]}"; do
     brew install "$package" || true
