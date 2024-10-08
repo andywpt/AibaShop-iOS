@@ -17,13 +17,6 @@ jobs:
         with:
           ruby-version: 3.2.1
           bundler-cache: true
-      
-      - name: Generate project
-        env:
-          PASSPHRASE: ${{ secrets.PASSPHRASE }}
-        run: |
-          echo "${PASSPHRASE}" > passphrase
-          make
 
       - name: Cache/Restore Pod derived data
         id: pod-cache
@@ -31,6 +24,14 @@ jobs:
         with:
           path: .local_derived_data
           key: test-pods-derived-data-${{ hashFiles('**/Podfile.lock') }}
+
+      - name: Generate project
+        if: steps.pod-cache.outputs.cache-hit != 'true'
+        env:
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+        run: |
+          echo "${PASSPHRASE}" > passphrase
+          make
   
       - name: Run unit tests
         if: steps.pod-cache.outputs.cache-hit != 'true'
