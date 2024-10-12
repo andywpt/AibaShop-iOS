@@ -1,24 +1,19 @@
 #!/bin/bash
-#!/bin/bash
 
-# Define titles and headers for the tables
 system_title="System"
 git_title="Git"
 system_header=("Name" "Value")
 git_header=("Name" "Value")
 
-# Initialize arrays for combined rows
 system_rows=()
 git_rows=()
 
-# Function to add rows to the system information table
 add_system_row() {
-    system_rows+=("$1	$2")  # Use tab as separator
+    system_rows+=("$1"$'\t'"$2")
 }
 
-# Function to add rows to the Git information table
 add_git_row() {
-    git_rows+=("$1	$2")  # Use tab as separator
+    git_rows+=("$1"$'\t'"$2")
 }
 
 # Add system information
