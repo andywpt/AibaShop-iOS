@@ -2,12 +2,15 @@
 default: setup
 
 setup: \
+  log_info \
   install_dependencies \
 	decrypt_files \
 	generate_project
 
+log_info: 
+	Configurations/Make/debug_info.sh
+
 install_dependencies:
-	bundle install
 	Configurations/Make/install_dependencies.sh
 
 decrypt_files:
