@@ -12,7 +12,7 @@ setup: \
 	done
 	
 log_info: 
-	[ -f debug.log ] && rm debug.log
+	[ -f debug.log ] || > debug.log || true
 	sh Configurations/Make/debug_info.sh
 
 install_dependencies:
