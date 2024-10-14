@@ -1,11 +1,13 @@
+#!/bin/sh
+
 print_table() {
     local title="$1"
-    local -a headers=("${!2}") # Column headers passed as array
-    local -a rows=("${!3}")    # Row data passed as array
+    local -a headers=("${!2}")
+    local -a rows=("${!3}")
 
     # Calculate the maximum lengths of each column
     local column_lengths=()
-    for ((i = 0; i < ${#headers[@]}; i++)); do
+    for i in ${!headers[@]}; do
         column_lengths[i]=${#headers[i]}
     done
 
@@ -31,17 +33,17 @@ print_table() {
     local padding=$((total_width - ${#title} - 4)) # 2 for leading and trailing spaces
     printf "| %*s \033[32m%s\033[0m %*s |\n" $((padding / 2)) "" "$title" $((padding - padding / 2)) ""
 
-    # Print separator after the title
-    printf "+%s+\n" "$(printf "%-${total_width}s" "" | tr ' ' '-')"
+    # # Print separator after the title
+    # printf "+%s+\n" "$(printf "%-${total_width}s" "" | tr ' ' '-')"
 
-    # Print header with adjusted widths
-    for ((i = 0; i < ${#headers[@]}; i++)); do
-        printf "| %-${column_lengths[i]}s " "${headers[i]}"
-    done
-    printf "|\n"
+    # # Print header with adjusted widths
+    # for ((i = 0; i < ${#headers[@]}; i++)); do
+    #     printf "| %-${column_lengths[i]}s " "${headers[i]}"
+    # done
+    # printf "|\n"
     
     # Print separator after the header
-    printf "+%s+\n" "$(printf "%-${total_width}s" "" | tr ' ' '-')"
+    printf "+%s+\n" "$(printf "%-${total_width}s" "" | sed 's/ /-/g')"
 
     # Print each row with adjusted column widths
     for row in "${rows[@]}"; do
@@ -52,6 +54,5 @@ print_table() {
         printf "|\n"
     done
 
-    # Print bottom border
-    printf "+%s+\n" "$(printf "%-${total_width}s" "" | tr ' ' '-')"
+    printf "+%s+\n" "$(printf "%-${total_width}s" "" | sed 's/ /-/g')"
 }
