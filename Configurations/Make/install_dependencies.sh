@@ -19,11 +19,11 @@ IFS=$'\n' read -d '' -r -a brew_rows <<< "$brew_output"
 
 combined_rows+=("${brew_rows[@]}")
 
-gems=("cocoapods" "fastlane")
+gem_names=$(grep "^\s*gem\s\+'\S\+'" Gemfile | sed "s/.*gem '\([^']*\)'.*/\1/")
+IFS=$'\n' read -r -d '' -a gems <<< "$gem_names"$'\0'
 
 for gem_name in "${gems[@]}"; do
-    installed_version=$(gem list --local | grep "^$gem_name " | awk '{print $2}' | sed 's/[()]//g')
-    # Format the output as tab-separated values and add to combined_rows
+    installed_version=$(grep "$gem_name ([0-9.]*)" Gemfile.lock | sed "s/.*(\(.*\)).*/\1/")
     printf -v gem_row "%s\t%s\t%s" "$gem_name" "$installed_version"
     combined_rows+=("$gem_row")
 done
