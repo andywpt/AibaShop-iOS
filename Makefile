@@ -13,7 +13,7 @@ setup: \
 	
 log_info: 
 	[ -f debug.log ] && > debug.log || true
-	sh Configurations/Make/debug_info.sh
+	sh Configurations/Make/build_info.sh
 
 install_dependencies:
 	$(call start, "Installing dependencies")
