@@ -33,18 +33,6 @@ jobs:
         run: |
           echo "${PASSPHRASE}" > passphrase
           make
-          cat debug.log
-          echo "cat did not work lol"
-
-      - uses: pCYSl5EDgo/cat@master
-        id: debug
-        with:
-          path: debug.log
-
-      - name: Output debug information
-        env:
-          TEXT: ${{ steps.debug.outputs.text }}
-        run: echo $TEXT
   
       - name: Run unit tests
         if: steps.pod-cache.outputs.cache-hit != 'true'
