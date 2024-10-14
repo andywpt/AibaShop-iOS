@@ -6,7 +6,7 @@ success = printf "\e[32m✓ %s\e[0m\n" $(1)
 
 setup: \
   log_info \
-  install_dependencies \
+  install_packages \
 	decrypt_files \
 	generate_project \
 	done
@@ -15,8 +15,8 @@ log_info:
 	[ -f debug.log ] && > debug.log || true
 	sh Configurations/Make/build_info.sh
 
-install_dependencies:
-	$(call start, "Installing dependencies")
+install_packages:
+	$(call start, "Installing packages")
 	sh Configurations/Make/install_dependencies.sh
 
 decrypt_files:
