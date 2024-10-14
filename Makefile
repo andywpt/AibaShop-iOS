@@ -33,4 +33,4 @@ generate_project:
 	$(call success, "Project generated")
 
 done: 
-	printf "\e[32m%s\e[0m\n" "✓  All Done ლ(╹◡╹ლ)"
+	$(call success, "All Done ლ(╹◡╹ლ)")
