@@ -27,7 +27,7 @@ jobs:
         run: |
           echo "${PASSPHRASE}" > passphrase
           make
-          cat "debug.log"
+          echo $(cat debug.log)
 
       - name: Cache/Restore Pod derived data
         uses: actions/cache@v4
