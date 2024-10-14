@@ -2,6 +2,9 @@
 *.xcodeproj
 *.xcworkspace
 
+# Log Files
+/debug.log
+
 # Private Files
 passphrase
 /Configurations/Decrypted/

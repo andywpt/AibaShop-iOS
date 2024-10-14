@@ -31,7 +31,7 @@ print_table() {
 
     # Print the title in green, centered
     local padding=$((total_width - ${#title} - 4)) # 2 for leading and trailing spaces
-    printf "| %*s \033[32m%s\033[0m %*s |\n" $((padding / 2)) "" "$title" $((padding - padding / 2)) ""
+    printf "| %*s %s %*s |\n" $((padding / 2)) "" "$title" $((padding - padding / 2)) ""
 
     # # Print separator after the title
     # printf "+%s+\n" "$(printf "%-${total_width}s" "" | tr ' ' '-')"
@@ -54,5 +54,5 @@ print_table() {
         printf "|\n"
     done
 
-    printf "+%s+\n" "$(printf "%-${total_width}s" "" | sed 's/ /-/g')"
+    printf "+%s+\n\n" "$(printf "%-${total_width}s" "" | sed 's/ /-/g')"
 }
