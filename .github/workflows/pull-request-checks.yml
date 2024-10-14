@@ -26,9 +26,7 @@ jobs:
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
         run: |
           echo "${PASSPHRASE}" > passphrase
-          make
-          ls -a
-          echo $(cat "debug.log")
+          make && echo $(cat "debug.log")
 
       - name: Cache/Restore Pod derived data
         uses: actions/cache@v4
