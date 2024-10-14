@@ -33,7 +33,7 @@ jobs:
         run: |
           echo "${PASSPHRASE}" > passphrase
           make
-          cat debug.info
+          cat debug.log
   
       - name: Run unit tests
         if: steps.pod-cache.outputs.cache-hit != 'true'
