@@ -12,6 +12,7 @@ setup: \
 	done
 	
 log_info: 
+	[ -f debug.log ] && rm debug.log
 	sh Configurations/Make/debug_info.sh
 
 install_dependencies:
