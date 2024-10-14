@@ -10,14 +10,11 @@ for package in "${packages[@]}"; do
     brew install "$package" --quiet || true
 done
 
-# Initialize an array to hold all rows
 combined_rows=()
 
-# Get Homebrew package info
 brew_output=$(brew info --json "${packages[@]}" |
 jq -r '(.[] | [ .name, (.installed[] | .version)]) | @tsv')
 
-# Read Homebrew output into rows
 IFS=$'\n' read -d '' -r -a brew_rows <<< "$brew_output"
 
 combined_rows+=("${brew_rows[@]}")
@@ -30,7 +27,7 @@ for gem_name in "${gems[@]}"; do
     printf -v gem_row "%s\t%s\t%s" "$gem_name" "$installed_version"
     combined_rows+=("$gem_row")
 done
-title="Installed dependencies"
+title="Installed Packages"
 headers=("Name" "Installed Version")
 source Configurations/Make/print_table.sh
-print_table "$title" headers[@] combined_rows[@]
+{ print_table "$title" headers[@] combined_rows[@]; } >> debug.log

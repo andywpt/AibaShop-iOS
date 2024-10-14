@@ -13,4 +13,4 @@ add_system_row "Branch" "$(git rev-parse --abbrev-ref HEAD)"
 add_system_row "Commit" "$(git rev-parse --short HEAD)"
 
 source Configurations/Make/print_table.sh
-print_table "$system_title" system_header[@] system_rows[@]
+{ print_table "$system_title" system_header[@] system_rows[@] ; } >> debug.log

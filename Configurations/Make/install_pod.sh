@@ -1,5 +1,4 @@
 #!/bin/sh
-echo "⚙️  Installing pods in the project..."
 bundle exec pod install
 
 pod_names=$(grep "^\s*\bpod\b '\S\+'" Podfile | sed "s/.*'\(.*\)'.*/\1/")
@@ -11,7 +10,7 @@ for pod in "${pod_array[@]}"; do
     version=$(grep $regex Podfile.lock | sed 's/.*(\([0-9.]*\)).*/\1/')
     pod_version_array+=("$pod"$'\t'"$version")
 done
-title="Pod Dependencies"
+title="Installed Pod Dependencies"
 headers=("Name" "Installed Version")
 source Configurations/Make/print_table.sh
-print_table "$title" headers[@] pod_version_array[@]
+{ print_table "$title" headers[@] pod_version_array[@]; } >> debug.log
