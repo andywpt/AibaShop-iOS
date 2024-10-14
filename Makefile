@@ -1,7 +1,7 @@
 .SILENT:
 default: setup
 
-start = printf "\e[36m⚙️ %s...\e[0m\n" $(1)
+start = printf "\e[32m⚙️ %s...\e[0m\n" $(1)
 success = printf "\e[32m✓ %s\e[0m\n" $(1)
 
 setup: \
