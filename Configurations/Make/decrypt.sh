@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 [ -f "passphrase" ] || { echo "Error: File 'passphrase' not found" ; exit 1 ; } 
 
@@ -11,7 +11,7 @@ mkdir -p "$DECRYPTED_DIR"
 # Find all .gpg files in the Encrypted folder
 find "$ENCRYPTED_DIR" -type f -name "*.gpg" | while read -r file; do
   # Extract the filename without the .gpg extension
-  decrypted_file="${DECRYPTED_DIR}/$(basename "${file%.gpg}")"
+  decrypted_file="$DECRYPTED_DIR/$(basename "${file%.gpg}")"
   # Decrypt the file using gpg
   if ! gpg --quiet --batch --yes --decrypt --passphrase="$(cat passphrase)" \
     --output "$decrypted_file" "$file"; then

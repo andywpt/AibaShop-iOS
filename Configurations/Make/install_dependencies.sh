@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 command -v brew &> /dev/null || { echo "Please install homebrew first."; exit 1; }
 

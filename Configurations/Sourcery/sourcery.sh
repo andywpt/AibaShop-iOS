@@ -1,8 +1,5 @@
 #!/bin/sh
 # This script should run before the Complie Sources step in build phase
-# Adds support for Apple Silicon brew directory
-export PATH="$PATH:/opt/homebrew/bin"
-
 TEMPLATE_PATH=${PROJECT_DIR}/Configurations/Sourcery/config.stencil
 OUTPUT_PATH=${PROJECT_DIR}/AibaShop/Resources/Configs/Config.swift
 ENV_DIR=${PROJECT_DIR}/Configurations/Decrypted
@@ -20,6 +17,8 @@ esac
 # To pass in string you should use escaped quotes (\")
 arguments=$(sed -n 's/=/ /p' $file | awk '{printf "%s=\"%s\",", $1, $2}' | sed 's/,$//')
 
+# Adds support for Apple Silicon brew directory
+export PATH="$PATH:/opt/homebrew/bin"
 # Codegen
 sourcery \
     --templates $TEMPLATE_PATH \

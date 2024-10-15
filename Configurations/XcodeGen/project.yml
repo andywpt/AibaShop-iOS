@@ -131,7 +131,8 @@ targets:
           CODE_SIGN_ENTITLEMENTS: AibaShop/Resources/Entitlements/Production-AibaShop.entitlements
     preBuildScripts:
       - script: |
-          ${PROJECT_DIR}/Configurations/XcodeGen/pre_compile.sh
+          master_script="$PROJECT_DIR/Configurations/XcodeGen/pre_compile.sh"
+          chmod +x "$master_script" && "$master_script"
         basedOnDependencyAnalysis: false
     sources:
       - path: "${ROOT_DIR}/${PROJECT_NAME}"

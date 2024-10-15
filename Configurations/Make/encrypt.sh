@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 DECRYPTED_DIR="Configurations/Decrypted"
 ENCRYPTED_DIR="Configurations/Encrypted"
