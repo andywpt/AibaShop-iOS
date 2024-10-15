@@ -24,5 +24,5 @@ done
 
 title="Installed Packages"
 headers=("Name" "Installed Version")
-source Configurations/Make/print_table.sh
+. Configurations/Make/print_table.sh
 { print_table "$title" headers[@] combined_rows[@]; } >> debug.log
