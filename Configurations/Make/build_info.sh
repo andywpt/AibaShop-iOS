@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 system_title="System and Build Info"
 system_header=("Name" "Value")

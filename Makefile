@@ -15,7 +15,7 @@ setup: \
 	done
 	
 log_info: 
-	[ -f debug.log ] && > debug.log || true
+	[ -f debug.log ] && > debug.log || true 
 	sh $(SCRIPTS_DIR)/build_info.sh
 
 install_packages:
