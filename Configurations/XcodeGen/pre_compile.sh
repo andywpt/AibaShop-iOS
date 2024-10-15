@@ -1,4 +1,5 @@
 #!/bin/sh
+
 DIR="${PROJECT_DIR}/Configurations"
 chmod +x ${DIR}/Firebase/firebase.sh
 chmod +x ${DIR}/SwiftGen/swiftgen.sh

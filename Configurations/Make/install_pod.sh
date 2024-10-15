@@ -1,4 +1,5 @@
 #!/bin/sh
+
 bundle exec pod install
 pods=($(grep "^\s*\bpod\b '\S\+'" Podfile | sed "s/.*'\(.*\)'.*/\1/"))
 values=()

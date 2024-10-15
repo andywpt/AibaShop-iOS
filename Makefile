@@ -9,6 +9,7 @@ setup: \
   install_packages \
 	decrypt_files \
 	generate_project \
+	install_pod \
 	done
 	
 log_info: 
@@ -25,12 +26,13 @@ decrypt_files:
   
 generate_project:
 	$(call start, "Generating project")
-	set -a && \
-	source Configurations/XcodeGen/.xcodegen.env && \
-	set +a && \
-	xcodegen generate --quiet --spec Configurations/XcodeGen/project.yml --project ./ && \
-	$(call start, "Installing pods") && \
+	set -a && source Configurations/XcodeGen/.xcodegen.env && set +a && \
+	xcodegen generate --spec Configurations/XcodeGen/project.yml --project ./ --quiet 
+
+install_pod:
+	$(call start, "Installing pods")
+	set -a && source Configurations/XcodeGen/.xcodegen.env && set +a && \
 	sh Configurations/Make/install_pod.sh
 
-done: 
+done:
 	$(call success, "All Done ლ(╹◡╹ლ)")
