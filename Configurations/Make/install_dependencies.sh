@@ -1,4 +1,5 @@
 #!/bin/bash
+
 command -v brew &> /dev/null || { echo "Please install homebrew first."; exit 1; }
 
 bundle install --quiet
