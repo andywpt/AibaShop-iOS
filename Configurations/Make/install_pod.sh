@@ -10,5 +10,5 @@ for pod in "${pods[@]}"; do
 done
 title="Installed Pod Dependencies"
 headers=("Name" "Installed Version")
-source Configurations/Make/print_table.sh
+. Configurations/Make/print_table.sh
 { print_table "$title" headers[@] values[@]; } >> debug.log

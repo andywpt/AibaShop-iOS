@@ -1,6 +1,8 @@
 .SILENT:
 default: setup
 
+SCRIPTS_DIR = Configurations/Make
+XCODEGEN_DIR = Configurations/XcodeGen
 start = printf "\e[36m⚙️ %s...\e[0m\n" $(1)
 success = printf "\e[32m✓ %s\e[0m\n" $(1)
 
@@ -14,25 +16,25 @@ setup: \
 	
 log_info: 
 	[ -f debug.log ] && > debug.log || true
-	sh Configurations/Make/build_info.sh
+	sh $(SCRIPTS_DIR)/build_info.sh
 
 install_packages:
 	$(call start, "Installing packages")
-	sh Configurations/Make/install_dependencies.sh
+	sh $(SCRIPTS_DIR)/install_dependencies.sh
 
 decrypt_files:
 	$(call start, "Decrypting files")
-	sh Configurations/Make/decrypt.sh
+	sh $(SCRIPTS_DIR)/decrypt.sh
   
 generate_project:
 	$(call start, "Generating project")
-	set -a && source Configurations/XcodeGen/.xcodegen.env && set +a && \
-	xcodegen generate --spec Configurations/XcodeGen/project.yml --project ./ --quiet 
+	set -a && . $(XCODEGEN_DIR)/.xcodegen.env && set +a && \
+	xcodegen generate --spec $(XCODEGEN_DIR)/project.yml --project ./ --quiet 
 
 install_pod:
 	$(call start, "Installing pods")
-	set -a && source Configurations/XcodeGen/.xcodegen.env && set +a && \
-	sh Configurations/Make/install_pod.sh
+	set -a && . $(XCODEGEN_DIR)/.xcodegen.env && set +a && \
+	sh $(SCRIPTS_DIR)/install_pod.sh
 
 done:
 	$(call success, "All Done ლ(╹◡╹ლ)")
