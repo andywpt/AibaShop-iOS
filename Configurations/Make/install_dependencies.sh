@@ -22,7 +22,7 @@ for gem_name in "${gems[@]}"; do
     combined_rows+=("$gem_name"$'\t'"$installed_version")
 done
 
-title="Installed Packages"
+title="Packages Summary"
 headers=("Name" "Installed Version")
 . Configurations/Make/print_table.sh
 { print_table "$title" headers[@] combined_rows[@]; } >> debug.log

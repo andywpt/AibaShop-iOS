@@ -8,7 +8,7 @@ for pod in "${pods[@]}"; do
     version=$(grep $regex Podfile.lock | sed 's/.*(\([0-9.]*\)).*/\1/')
     values+=("$pod"$'\t'"$version")
 done
-title="Installed Pod Dependencies"
+title="Pod Dependencies Summary"
 headers=("Name" "Installed Version")
 . Configurations/Make/print_table.sh
 { print_table "$title" headers[@] values[@]; } >> debug.log
