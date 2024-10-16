@@ -1,6 +1,6 @@
 #!/bin/sh
 
-system_title="System and Build Info"
+system_title="System and Build Summary"
 system_header=("Name" "Value")
 system_rows=()
 add_system_row() {
